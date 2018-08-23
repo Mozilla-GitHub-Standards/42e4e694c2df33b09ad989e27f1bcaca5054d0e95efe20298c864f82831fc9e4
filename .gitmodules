@@ -1,3 +1,4 @@
 [submodule "repos/utils"]
 	path = repos/utils
 	url = ssh://git@github.com/scottidler/utils
+	branch = master
