@@ -1,4 +1,4 @@
-[submodule "repos/utils"]
-	path = repos/utils
-	url = ssh://git@github.com/scottidler/utils
+[submodule "lea/api/utils"]
+	path = lea/api/utils
+	url = https://github.com/scottidler/utils
 	branch = master

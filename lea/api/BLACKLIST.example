@@ -1,0 +1,6 @@
+# to use the BLACKLIST rename the file to BLACKLIST and enter your list of globs
+# used to prevent creating or deleting TXT records on the domains listed or matched
+
+some.common_name.org
+
+*.wildcards-aswell.com

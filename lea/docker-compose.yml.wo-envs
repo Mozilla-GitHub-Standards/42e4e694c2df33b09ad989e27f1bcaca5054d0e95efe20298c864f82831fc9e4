@@ -1,0 +1,21 @@
+version: '2'
+services:
+    api:
+        network_mode: host
+        restart: always
+        build: ./api
+        expose:
+          - "8000"
+        volumes:
+          - /data/lea:/data/lea
+        entrypoint: /usr/src/app/entrypoint.sh
+    nginx:
+        network_mode: host
+        restart: always
+        build: ./nginx
+        ports:
+          - "80:80"
+        volumes_from:
+          - api
+        depends_on:
+          - api

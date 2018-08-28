@@ -102,3 +102,33 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#doit
+.doit.db
+
+# prevent version file from being checked in
+lea/api/VERSION
+
+# prevent blacklist file from being checked in
+lea/api/BLACKLIST
+
+# prevent default default LOG_LEVEL file from being checked in
+LOG_LEVEL
+
+# prevent secrets config.yml file from being checked in
+lea/api/config.yml
+lea/api/.config.yml
+
+# prevent apikey files from being checked in
+lea/api/*apikey.yml
+
+# skip .bak files
+*.bak
+
+digitool.py
+
+#prevent checking in old logs that are generated on each deploy
+oldlogs/
+
+# prevent docker-compose.yml from being check in
+docker-compose.yml
