@@ -354,27 +354,6 @@ def task_config():
     }
 
 
-def task_example():
-    '''
-    cp|strip config.yml -> config.yml.example
-    '''
-    apikey = '82_CHAR_APIKEY'
-    punch = fmt('''
-    authorities:
-        digicert:
-            apikey: {apikey}
-    destinations:
-        zeus:
-            apikey: {apikey}
-    ''')
-    return {
-        'actions': [
-            fmt('cp {CONFIG_YML}.example {CONFIG_YML}.bak'),
-            fmt('cp {CONFIG_YML} {CONFIG_YML}.example'),
-            lambda: _update_config(CONFIG_YML+'.example', yaml.safe_load(punch)),
-        ],
-    }
-
 def task_rmcache():
     '''
     recursively delete python cache files
@@ -439,19 +418,6 @@ def task_prune():
         'actions': ['docker rm `docker ps -q -f "status=exited"`'],
         'uptodate': ['[ -n "`docker ps -q -f status=exited`" ] && exit 1 || exit 0']
     }
-
-def task_zeus():
-    '''
-    launch zeus containers
-    '''
-    image = 'zeus17.3'
-    for container in [ fmt('{image}_test{num}') for num in (1, 2)]:
-        yield {
-            'task_dep': ['prune'],
-            'name': container,
-            'actions': [fmt('docker run -d --name {container} {image}')],
-            'uptodate': [fmt('[ -n "`docker ps -q -f name={container}`" ] && exit 0 || exit 1')]
-        }
 
 if __name__ == '__main__':
     print('should be run with doit installed')
