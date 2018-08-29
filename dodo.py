@@ -16,10 +16,13 @@ TESTDIR = REPOROOT + '/tests' #FIXME: PROJDIR?
 UTILSDIR = REPOROOT + '/repos/utils'
 LOGDIR = REPOROOT + '/oldlogs'
 
-UID = os.getuid()
-GID = pwd.getpwuid(UID).pw_gid
-USER = pwd.getpwuid(UID).pw_name
-ENV=dict(AC_UID=UID, AC_GID=GID, AC_USER=USER)
+LEA_UID = os.getuid()
+LEA_GID = pwd.getpwuid(LEA_UID).pw_gid
+LEA_USER = pwd.getpwuid(LEA_UID).pw_name
+LEA_APP_PORT=os.environ.get('LEA_APP_PORT', 8001)
+LEA_APP_TIMEOUT=os.environ.get('LEA_APP_TIMEOUT', 120)
+LEA_APP_WORKERS=os.environ.get('LEA_APP_WORKERS', 2)
+LEA_APP_MODULE=os.environ.get('LEA_APP_MODULE', 'main:app')
 
 sys.path.insert(0, APPDIR)
 from config import _update_config, CONFIG_YML, DOT_CONFIG_YML
@@ -50,11 +53,15 @@ class UnknownPkgmgrError(Exception):
     def __init__(self):
         super(UnknownPkgmgrError, self).__init__('unknown pkgmgr!')
 
-def get_user_uid_gid():
+def get_lea_envs():
     return [
-        fmt('AC_USER={USER}'),
-        fmt('AC_UID={UID}'),
-        fmt('AC_GID={GID}'),
+        fmt('LEA_UID={LEA_UID}'),
+        fmt('LEA_GID={LEA_GID}'),
+        fmt('LEA_USER={LEA_USER}'),
+        fmt('LEA_APP_PORT={LEA_APP_PORT}'),
+        fmt('LEA_APP_TIMEOUT={LEA_APP_TIMEOUT}'),
+        fmt('LEA_APP_WORKERS={LEA_APP_WORKERS}'),
+        fmt('LEA_APP_MODULE={LEA_APP_MODULE}'),
     ]
 
 def get_env_vars(regex=None):
@@ -247,7 +254,7 @@ def task_environment():
         dcy = yaml.safe_load(open(fmt('{PROJDIR}/docker-compose.yml.wo-envs')))
         for svc in dcy['services'].keys():
             envs = dcy['services'][svc].get('environment', [])
-            envs += get_user_uid_gid()
+            envs += get_lea_envs()
             envs += get_env_vars(re.compile('(no|http|https)_proxy', re.IGNORECASE))
             pfmt('{svc}:')
             for env in envs:
