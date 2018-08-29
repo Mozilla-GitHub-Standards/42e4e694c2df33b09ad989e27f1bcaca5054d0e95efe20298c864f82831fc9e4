@@ -65,7 +65,7 @@ LOGGING_LEVELS = {
     50: 'FATAL',
 }
 
-class EmptyJsonError(AutocertError):
+class EmptyJsonError(Exception):
     def __init__(self, json):
         message = fmt('empty json error ={0}', json)
         super(EmptyJsonError, self).__init__(message)
