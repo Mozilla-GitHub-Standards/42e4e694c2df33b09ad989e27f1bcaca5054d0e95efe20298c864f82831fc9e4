@@ -2,3 +2,7 @@
 	path = lea/api/utils
 	url = https://github.com/scottidler/utils
 	branch = master
+[submodule "lea/api/acme.sh"]
+	path = lea/api/acme.sh
+	url = https://github.com/mozilla-it/acme.sh
+	branch = master
