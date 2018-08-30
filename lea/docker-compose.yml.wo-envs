@@ -8,7 +8,7 @@ services:
         volumes_from:
           - api
         links:
-          - api  # will use this one here
+          - api
     api:
         build: ./api
         restart: always
