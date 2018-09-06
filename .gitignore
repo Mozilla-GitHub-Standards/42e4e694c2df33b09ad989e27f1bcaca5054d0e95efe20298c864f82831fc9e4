@@ -125,6 +125,9 @@ lea/api/*apikey.yml
 # skip .bak files
 *.bak
 
+# skip .pem files
+*.pem
+
 digitool.py
 
 #prevent checking in old logs that are generated on each deploy
