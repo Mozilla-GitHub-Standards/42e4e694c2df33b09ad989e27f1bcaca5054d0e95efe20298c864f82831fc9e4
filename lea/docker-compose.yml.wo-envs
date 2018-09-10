@@ -19,3 +19,4 @@ services:
           - api
         depends_on:
           - api
+        command: [nginx-debug, '-g', 'daemon off;']
