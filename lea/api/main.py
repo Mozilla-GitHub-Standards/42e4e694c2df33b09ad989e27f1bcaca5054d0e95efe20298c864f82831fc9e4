@@ -11,6 +11,7 @@ from pdb import set_trace as breakpoint
 from pprint import pformat
 
 from utils.fmt import *
+from config import CFG
 from lea import app
 
 STATUS_CODES = {
@@ -72,16 +73,12 @@ class EmptyJsonError(Exception):
 
 @app.before_first_request
 def initialize():
-    from logging import getLogger
-    from logging.config import dictConfig
-    from config import CFG
     if sys.argv[0] != 'venv/bin/pytest':
-        dictConfig(CFG.logging)     #3
-        LEVEL = LOGGING_LEVELS[getLogger('api').getEffectiveLevel()]
+        LEVEL = CFG.logging.loggers.api.level
         PID = os.getpid()
         PPID = os.getppid()
         USER = pwd.getpwuid(os.getuid())[0]
-        pfmt('starting lea api with log level={LEVEL}, pid={PID}, ppid={PPID} by user={USER}')
+        pfmt('starting api with log level={LEVEL}, pid={PID}, ppid={PPID} by user={USER}')
 
 def log_request(user, hostname, ip, method, path, json):
     app.logger.info(fmt('{user}@{hostname} from {ip} ran {method} {path} with json=\n"{json}"'))
