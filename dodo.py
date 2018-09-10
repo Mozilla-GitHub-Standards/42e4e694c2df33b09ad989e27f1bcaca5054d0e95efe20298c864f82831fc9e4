@@ -10,7 +10,8 @@ from doit import get_var
 from ruamel import yaml
 
 REPOROOT = os.path.dirname(os.path.abspath(__file__))
-PROJDIR = REPOROOT + '/lea'
+PROJNAME = 'lea'
+PROJDIR = REPOROOT + '/' + PROJNAME
 APPDIR = PROJDIR + '/api'
 TESTDIR = REPOROOT + '/tests' #FIXME: PROJDIR?
 UTILSDIR = REPOROOT + '/repos/utils'
@@ -185,7 +186,7 @@ def task_pull():
     dirty_update = fmt(dirty, cmd=update)
 
     yield {
-        'name': 'mozilla-it/lea-infoblox-rest', #FIXME should come from git.reponame?
+        'name': 'mozilla-it/lea', #FIXME should come from git.reponame?
         'actions': [
             fmt('if {test}; then {pull}; else {dirty_pull}; exit 1; fi'),
         ],
@@ -422,8 +423,29 @@ def task_prune():
     prune stopped containers
     '''
     return {
-        'actions': ['docker rm `docker ps -q -f "status=exited"`'],
-        'uptodate': ['[ -n "`docker ps -q -f status=exited`" ] && exit 1 || exit 0']
+        'actions': [
+            'docker rm `docker ps -q -f "status=exited"`',
+        ],
+        'uptodate': [
+            '[ -n "`docker ps -q -f status=exited`" ] && exit 1 || exit 0',
+        ],
+    }
+
+def task_stop():
+    '''
+    stop running lea containers
+    '''
+    def check_docker_ps():
+        cmd = 'docker ps --format "{{.Names}}" | grep ' + PROJNAME + ' | { grep -v grep || true; }'
+        out = call(cmd, throw=True)[1]
+        return out.split('\n') if out else []
+    return {
+        'actions': [
+            fmt('docker rm -f {containers}', containers=' '.join(check_docker_ps())),
+        ],
+        'uptodate': [
+            lambda: len(check_docker_ps()) == 0,
+        ],
     }
 
 if __name__ == '__main__':
