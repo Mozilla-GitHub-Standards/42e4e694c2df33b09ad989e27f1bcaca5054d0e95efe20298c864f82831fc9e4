@@ -272,6 +272,54 @@ def task_environment():
         ]
     }
 
+def task_tls():
+    '''
+    create ca and server and client key, csr and crt files
+    '''
+    tls = '/data/lea/tls'
+    env = 'PASS=TEST'
+    envp = 'env:PASS'
+    ca_subject = '/C=US/ST=Oregon/L=Portland/O=LEA CA/OU=CA/CN=lea-ca.com'
+    targets = [
+        fmt('{tls}/ca.crt'),
+        fmt('{tls}/server.key'),
+        fmt('{tls}/server.crt'),
+    ]
+    def uptodate():
+        return all([os.path.isfile(t) for t in targets])
+    yield {
+        'name': 'ca',
+        'actions': [
+            fmt('mkdir -p {tls}/'),
+            fmt('{env} openssl genrsa -aes256 -passout {envp} -out {tls}/ca.key 4096'),
+            fmt('{env} openssl req -new -x509 -days 365 -passin {envp} -passout {envp} -subj "{ca_subject}" -key {tls}/ca.key -out {tls}/ca.crt'),
+        ],
+        'uptodate': [
+            uptodate,
+        ],
+    }
+    oids = dict(
+        server='/C=US/ST=Oregon/L=Portland/O=LEA Server/OU=Server/CN=lea-server.com',
+        client='/C=US/ST=Oregon/L=Portland/O=LEA Client/OU=Client/CN=lea-client.com',
+    )
+    for name, subject in oids.items():
+        yield {
+            'name': name,
+            'task_dep': [
+                'tls:ca',
+            ],
+            'actions': [
+                fmt('mkdir -p {tls}/'),
+                fmt('{env} openssl genrsa -aes256 -passout {envp} -out {tls}/{name}.key 2048'),
+                fmt('{env} openssl req -new -passin {envp} -subj "{subject}" -key {tls}/{name}.key -out {tls}/{name}.csr'),
+                fmt('{env} openssl x509 -req -days 365 -in {tls}/{name}.csr -CA {tls}/ca.crt -passin {envp} -CAkey {tls}/ca.key -set_serial 01 -out {tls}/{name}.crt'),
+                fmt('{env} openssl rsa -passin {envp} -in {tls}/{name}.key -out {tls}/{name}.key'),
+            ],
+            'uptodate': [
+                uptodate,
+            ],
+        }
+
 def task_deploy():
     '''
     deloy flask app via docker-compose
