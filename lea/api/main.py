@@ -80,52 +80,49 @@ def initialize():
         USER = pwd.getpwuid(os.getuid())[0]
         pfmt('starting api with log level={LEVEL}, pid={PID}, ppid={PPID} by user={USER}')
 
-def log_request(user, hostname, ip, method, path, json):
-    app.logger.info(fmt('{user}@{hostname} from {ip} ran {method} {path} with json=\n"{json}"'))
+def log_request(user, hostname, ip, method, path, headers, json):
+    app.logger.info(fmt('{user}@{hostname} from {ip} ran {method} {path}\nwith headers=\n{headers}\nwith json=\n"{json}"'))
 
 @app.route('/lea/version', methods=['GET'])
 def version():
-    args = request.json
-    args = args if args else {}
-    cfg = args.get('cfg', None)
+    json = request.json if request.json else {}
     log_request(
-        args.get('user', 'unknown'),
-        args.get('hostname', 'unknown'),
+        json.get('user', 'unknown'),
+        json.get('hostname', 'unknown'),
         request.remote_addr,
         request.method,
         request.path,
-        args)
+        request.headers,
+        json)
     from utils.version import version
     return jsonify(dict(version=version))
 
 @app.route('/lea/config', methods=['GET'])
 def config():
-    args = request.json
-    args = args if args else {}
-    cfg = args.get('cfg', None)
+    json = request.json if request.json else {}
     log_request(
-        args.get('user', 'unknown'),
-        args.get('hostname', 'unknown'),
+        json.get('user', 'unknown'),
+        json.get('hostname', 'unknown'),
         request.remote_addr,
         request.method,
         request.path,
-        args)
+        request.headers,
+        json)
     from config import _load_config
     cfg = _load_config(fixup=False)
     return jsonify({'config': cfg})
 
 @app.route('/lea', methods=['GET', 'PUT', 'POST', 'DELETE'])
 def route():
-    args = request.json
-    args = args if args else {}
-    cfg = args.get('cfg', None)
+    json = request.json if request.json else {}
     log_request(
-        args.get('user', 'unknown'),
-        args.get('hostname', 'unknown'),
+        json.get('user', 'unknown'),
+        json.get('hostname', 'unknown'),
         request.remote_addr,
         request.method,
         request.path,
-        args)
+        request.headers,
+        json)
     try:
         endpoint = create_endpoint(request.method, cfg, args)
         json, status = endpoint.execute()
