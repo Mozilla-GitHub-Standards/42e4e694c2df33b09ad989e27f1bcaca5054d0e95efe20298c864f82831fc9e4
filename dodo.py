@@ -204,6 +204,7 @@ def task_test():
     '''
     setup venv and run pytest
     '''
+    pip3 = 'venv/bin/pip3'
     return {
         'task_dep': [
             'noroot',
@@ -211,9 +212,9 @@ def task_test():
         ],
         'actions': [
             'virtualenv --python=$(which python3) venv',
-            'venv/bin/pip3 install --upgrade pip',
-            fmt('venv/bin/pip3 install -r {REPOROOT}/requirements.txt'),
-            fmt('venv/bin/pip3 install -r {TESTDIR}/requirements.txt'),
+            fmt('{pip3} install --upgrade pip'),
+            fmt('{pip3} install -r {REPOROOT}/requirements.txt'),
+            fmt('{pip3} install -r {TESTDIR}/requirements.txt'),
             fmt('{ENVS} venv/bin/python3 -m pytest -s -vv tests/api'),
         ],
     }
