@@ -335,6 +335,7 @@ def task_deploy():
             'dockercompose',
             'environment',
             'savelogs',
+            'tls',
         ],
         'actions': [
             fmt('cd {PROJDIR} && docker-compose build'),
